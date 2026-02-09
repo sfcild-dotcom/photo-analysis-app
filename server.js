@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 
 // 1. 발급받은 새 API 키를 여기에 넣으세요
-const genAI = new GoogleGenerativeAI("여기에_새_API_키_입력");
+const genAI = new GoogleGenerativeAI("AIzaSyB52JCTKlvwrHxqyX-6x1UuCXzdy7Vvino");
 
 // 2. 모델 설정 (현재 리스트에 있는 2.0 버전 명칭 사용)
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
