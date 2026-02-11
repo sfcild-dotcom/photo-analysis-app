@@ -6,12 +6,11 @@ import App from './App';
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
+  throw new Error("Could not find root element to mount the app");
 }
 
 const root = ReactDOM.createRoot(rootElement);
 
-// 핵심: <App />이 반드시 포함되어야 화면이 나타납니다.
 root.render(
   <React.StrictMode>
     <App />
