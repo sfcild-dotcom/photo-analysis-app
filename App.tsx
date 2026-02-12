@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 
-// [필독] 작가님의 Gemini API 키를 아래 큰따옴표 안에 넣어주세요.
+// [중요] 작가님의 API 키를 아래 큰따옴표 안에 넣어주세요.
 const GEMINI_API_KEY = "AIzaSyCgemY-bhMY98WTxsG_uHs9O95EeFXDdmg"; 
 
 function App() {
@@ -26,8 +26,7 @@ function App() {
 
     try {
       const results = await Promise.all(
-        files.map(async (file, i) => {
-          // 실제 사진 데이터를 읽어와서 Gemini API로 전송하는 로직입니다.
+        files.map(async (file) => {
           const reader = new FileReader();
           const base64Promise = new Promise((resolve) => {
             reader.onload = () => resolve((reader.result as string).split(',')[1]);
@@ -53,7 +52,7 @@ function App() {
       );
       setReport(results);
     } catch (error) {
-      alert("API 연결을 확인해주세요. (키가 정확한지 확인이 필요합니다)");
+      alert("API 연결 오류: 키가 정확한지, 혹은 할당량이 남았는지 확인이 필요합니다.");
     } finally {
       setAnalyzing(false);
     }
