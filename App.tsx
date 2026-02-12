@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 
 // [중요] 작가님의 API 키를 아래 큰따옴표 안에 넣어주세요.
-const GEMINI_API_KEY = "AIzaSyCgemY-bhMY98WTxsG_uHs9O95EeFXDdmg"; 
+const GEMINI_API_KEY = "AIzaSyD-_naKh3R01wml4JWUNVcoliaEnDWlo0o"; 
 
 function App() {
   const [analyzing, setAnalyzing] = useState(false);
