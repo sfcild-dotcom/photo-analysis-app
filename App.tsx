@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // [필독] 작가님의 API 키를 여기에 정확히 넣어주세요.
-const GEMINI_API_KEY = "AIzaSyD-_naKh3R01wml4JWUNVcoliaEnDWlo0o"; 
+const GEMINI_API_KEY = "AIzaSyCgemY-bhMY98WTxsG_uHs9O95EeFXDdmg"; 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 function App() {
