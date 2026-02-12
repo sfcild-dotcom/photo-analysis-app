@@ -1,14 +1,19 @@
 
 import React, { useState } from 'react';
 
+// [필독] 작가님의 Gemini API 키를 아래 큰따옴표 안에 넣어주세요.
+const GEMINI_API_KEY = "AIzaSyCgemY-bhMY98WTxsG_uHs9O95EeFXDdmg"; 
+
 function App() {
   const [analyzing, setAnalyzing] = useState(false);
   const [report, setReport] = useState<string[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
 
-  const processFiles = (files: FileList | null) => {
-    if (files) {
-      const fileArray = Array.from(files);
+  const processFiles = (uploadedFiles: FileList | null) => {
+    if (uploadedFiles) {
+      const fileArray = Array.from(uploadedFiles);
+      setFiles(prev => [...prev, ...fileArray].slice(0, 14));
       const newPreviews = fileArray.map(file => URL.createObjectURL(file));
       setPreviews(prev => [...prev, ...newPreviews].slice(0, 14));
       setReport([]);
@@ -16,31 +21,49 @@ function App() {
   };
 
   const startAnalysis = async () => {
-    if (previews.length === 0) return alert("분석할 사진을 먼저 올려주세요!");
+    if (files.length === 0) return alert("분석할 사진을 먼저 올려주세요!");
     setAnalyzing(true);
 
-    // [정밀 묘사 로직] 각 사진의 시각적 요소를 15년 차 작가의 시선으로 풍성하게 추출합니다.
-    const realDescriptions = previews.map((_, i) => {
-      const descriptions = [
-        "차분한 베이지 톤의 벽면과 은은한 매립형 간접 조명이 조화를 이루어 고급스러운 호텔 로비의 평온한 분위기를 자아냅니다. 대리석 바닥에 매끄럽게 반사되는 빛의 질감은 공간의 깊이감을 더해주며 비즈니스 여행자에게 신뢰를 주는 첫인상을 완성하더라고요.",
-        "매끄러운 대리석 테이블 위에 정교하게 배치된 금색 커트러리와 화이트 식기류가 다이닝의 품격을 한껏 높여줍니다. 갓 구워낸 빵의 바삭한 질감과 신선한 식재료의 색감이 돋보여 현장의 생생한 미식 경험이 느껴지는 듯한 기분이 듭니다.",
-        "통유리창 너머로 펼쳐진 도심의 스카이라인이 푸른빛의 새벽 공기와 만나 지적이고 세련된 느낌을 선사합니다. 창가에 맺힌 미세한 이슬방울이 비즈니스의 시작을 알리는 차분하면서도 역동적인 온도감을 그대로 전달합니다.",
-        "짙은 우드 소재의 견고한 데스크와 인체공학적인 가죽 의자가 배치된 워크 스테이션입니다. 업무에 몰입하기 최적인 조도와 정갈한 가구 배치가 돋보이며 프로페셔널한 작가의 시선에서도 완벽한 작업 환경으로 느껴질 만큼 밀도가 높습니다."
-      ];
-      return descriptions[i % descriptions.length] + " 사진 속 사물의 배치와 특유의 색감이 공간의 가치를 더욱 선명하게 드러내고 있습니다.";
-    });
+    try {
+      const results = await Promise.all(
+        files.map(async (file, i) => {
+          // 실제 사진 데이터를 읽어와서 Gemini API로 전송하는 로직입니다.
+          const reader = new FileReader();
+          const base64Promise = new Promise((resolve) => {
+            reader.onload = () => resolve((reader.result as string).split(',')[1]);
+            reader.readAsDataURL(file);
+          });
+          const base64Data = await base64Promise;
 
-    setTimeout(() => {
-      setReport(realDescriptions);
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  { text: "이 사진의 인테리어 요소, 색감, 질감, 사물의 배치를 15년 차 베테랑 작가의 시선으로 아주 풍성하고 구체적으로 묘사해줘. 안내 문구 없이 즉시 묘사만 시작할 것." },
+                  { inline_data: { mime_type: file.type, data: base64Data } }
+                ]
+              }]
+            })
+          });
+          const data = await response.json();
+          return data.candidates[0].content.parts[0].text;
+        })
+      );
+      setReport(results);
+    } catch (error) {
+      alert("API 연결을 확인해주세요. (키가 정확한지 확인이 필요합니다)");
+    } finally {
       setAnalyzing(false);
-    }, 2000);
+    }
   };
 
   return (
     <div style={{ backgroundColor: '#1a1f2e', color: '#fff', minHeight: '100vh', padding: '40px 20px', textAlign: 'center', fontFamily: 'sans-serif' }}>
       <header style={{ marginBottom: '40px' }}>
         <h1 style={{ color: '#ff69b4', fontSize: '32px' }}>✨ 띄부띄부 사진 분석기</h1>
-        <p style={{ color: '#ccc' }}>12~14장의 사진을 드래그하거나 격자를 클릭해 업로드하세요.</p>
+        <p style={{ color: '#ccc' }}>12~14장의 사진을 업로드하고 실제 AI 분석을 시작하세요.</p>
       </header>
 
       <div 
@@ -59,13 +82,13 @@ function App() {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '40px' }}>
-        <button onClick={startAnalysis} style={{ backgroundColor: '#ff69b4', color: '#fff', padding: '15px 40px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>✨ 분석 시작하기</button>
-        <button onClick={() => { setPreviews([]); setReport([]); }} style={{ backgroundColor: '#4a5568', color: '#fff', padding: '15px 40px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>🔄 초기화</button>
+        <button onClick={startAnalysis} style={{ backgroundColor: '#ff69b4', color: '#fff', padding: '15px 40px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>{analyzing ? "⌛ 분석 중..." : "✨ 분석 시작하기"}</button>
+        <button onClick={() => { setPreviews([]); setFiles([]); setReport([]); }} style={{ backgroundColor: '#4a5568', color: '#fff', padding: '15px 40px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>🔄 초기화</button>
       </div>
 
       {report.length > 0 && (
         <div style={{ background: '#2d3748', padding: '30px', borderRadius: '12px', maxWidth: '850px', margin: '40px auto', textAlign: 'left' }}>
-          <h3 style={{ color: '#ff69b4', textAlign: 'center', marginBottom: '20px' }}>🚀 정밀 현장 분석 리포트</h3>
+          <h3 style={{ color: '#ff69b4', textAlign: 'center', marginBottom: '20px' }}>🚀 실시간 현장 분석 리포트</h3>
           {report.map((text, idx) => (
             <div key={idx} style={{ marginBottom: '15px', padding: '12px', borderBottom: '1px dotted #4a5568', lineHeight: '1.6' }}>
               <strong style={{ color: '#ff69b4', marginRight: '10px' }}>[사진 {idx + 1}]</strong> {text}
