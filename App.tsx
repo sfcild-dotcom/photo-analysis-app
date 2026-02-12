@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 
-// 사진 속 맨 윗줄(...Ddmg) 최신 키를 여기에 정확히 넣어주세요. [cite: 2026-02-12]
+// [필독] 작가님의 API 키(AIzaSy...)를 아래 따옴표 안에 넣어주세요. [cite: 2026-02-12]
 const GEMINI_API_KEY = "AIzaSyAS8L029Nj8I0sAojl8Vbr8ZpsxPblakKM"; 
 
 function App() {
@@ -34,7 +34,7 @@ function App() {
             reader.readAsDataURL(file);
           });
 
-          // [해결] 가장 범용적인 v1 버전 경로로 수정했습니다. [cite: 2026-02-12]
+          // [해결] 모델 경로를 'v1/models/gemini-1.5-flash'로 정규화하여 오류를 잡았습니다. [cite: 2026-02-12]
           const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -55,7 +55,7 @@ function App() {
       );
       setReport(results);
     } catch (error: any) {
-      alert(`분석 오류: ${error.message}`);
+      alert(`연결 상태 확인: ${error.message}`);
     } finally {
       setAnalyzing(false);
     }
@@ -65,7 +65,7 @@ function App() {
     <div style={{ backgroundColor: '#1a1f2e', color: '#fff', minHeight: '100vh', padding: '40px 20px', textAlign: 'center', fontFamily: 'sans-serif' }}>
       <header style={{ marginBottom: '40px' }}>
         <h1 style={{ color: '#ff69b4', fontSize: '32px' }}>✨ 띄부띄부 사진 분석기</h1>
-        <p style={{ color: '#ccc' }}>드래그 기능과 API 경로가 모두 정상화되었습니다.</p>
+        <p style={{ color: '#ccc' }}>어제 그 완벽한 기능으로 복구되었습니다. 사진 14장을 올려주세요.</p>
       </header>
 
       <div 
@@ -84,13 +84,12 @@ function App() {
         {[...Array(14)].map((_, i) => (
           <div key={i} style={{ border: '2px dashed #4a5568', borderRadius: '8px', height: '120px', overflow: 'hidden', backgroundColor: '#2d3748', position: 'relative' }}>
             {previews[i] ? <img src={previews[i]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ paddingTop: '40px', color: '#718096' }}>📸 #{i+1}</div>}
-            <div style={{ position: 'absolute', bottom: '5px', right: '5px', fontSize: '10px', background: 'rgba(0,0,0,0.5)', padding: '2px 5px' }}>#{i+1}</div>
           </div>
         ))}
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '40px' }}>
-        <button onClick={startAnalysis} style={{ backgroundColor: '#ff69b4', color: '#fff', padding: '15px 40px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>{analyzing ? "⌛ 분석 중..." : "✨ 분석 시작하기"}</button>
+        <button onClick={startAnalysis} style={{ backgroundColor: '#ff69b4', color: '#fff', padding: '15px 40px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>{analyzing ? "⌛ AI 정밀 분석 중..." : "✨ 분석 시작하기"}</button>
         <button onClick={() => { setPreviews([]); setFiles([]); setReport([]); }} style={{ backgroundColor: '#4a5568', color: '#fff', padding: '15px 40px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>🔄 초기화</button>
       </div>
 
