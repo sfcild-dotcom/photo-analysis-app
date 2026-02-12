@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import React, { useState } from 'react';
 
 function App() {
   const [analyzing, setAnalyzing] = useState(false);
