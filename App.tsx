@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 
 // 사진 속 맨 윗줄(...Ddmg) 최신 키를 여기에 정확히 넣어주세요. [cite: 2026-02-12]
-const GEMINI_API_KEY = "AIzaSyDmg_여기에_복사한_키_붙여넣기"; 
+const GEMINI_API_KEY = "AIzaSyAS8L029Nj8I0sAojl8Vbr8ZpsxPblakKM"; 
 
 function App() {
   const [analyzing, setAnalyzing] = useState(false);
